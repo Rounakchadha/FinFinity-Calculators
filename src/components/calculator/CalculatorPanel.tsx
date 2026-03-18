@@ -23,11 +23,11 @@ const CalculatorPanel: React.FC<CalculatorPanelProps> = ({ config }) => {
 
   return (
     <div>
-      <h3 className="text-2xl lg:text-3xl font-bold mb-10 text-calc-text-primary/90">
+      <h3 className="text-2xl lg:text-3xl font-bold mb-10 text-calc-text-primary">
         {config.title}
       </h3>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
         {/* Left: Sliders */}
         <div className="lg:col-span-5">
           {config.sliders.map((slider, idx) => (
@@ -46,18 +46,15 @@ const CalculatorPanel: React.FC<CalculatorPanelProps> = ({ config }) => {
         </div>
 
         {/* Center: Chart */}
-        <div className="lg:col-span-3 flex items-start justify-center pt-4">
+        <div className="lg:col-span-4 flex items-center justify-center pt-4">
           <DonutComparisonChart data={config.chart} />
         </div>
 
         {/* Right: Results */}
-        <div className="lg:col-span-4 flex flex-col gap-4">
+        <div className="lg:col-span-3 flex flex-col justify-center gap-2">
           {config.results.map((res, idx) => (
             <ResultCard key={idx} label={res.label} value={res.value} highlight={res.highlight} />
           ))}
-          <button className="mt-3 w-full py-4 bg-calc-accent hover:brightness-110 text-calc-bg font-bold rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-calc-accent/20">
-            Get Detailed Report
-          </button>
         </div>
       </div>
     </div>
