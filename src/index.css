@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -66,15 +68,23 @@
     @apply border-border;
   }
   body {
+    font-family: 'Manrope', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     @apply bg-background text-foreground;
   }
+}
+
+.calc-number {
+  font-family: 'Sora', 'Manrope', system-ui, sans-serif;
+  font-feature-settings: 'tnum' 1;
+  font-weight: 500;
+  letter-spacing: -0.015em;
 }
 
 /* Custom range slider styling */
 .calculator-slider {
   -webkit-appearance: none;
   appearance: none;
-  height: 8px;
+  height: 4px;
   border-radius: 9999px;
   outline: none;
   cursor: pointer;
@@ -83,27 +93,33 @@
 .calculator-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background: hsl(168 76% 50%);
   border-radius: 50%;
   cursor: pointer;
-  border: 3px solid hsl(185 30% 7%);
-  box-shadow: 0 0 10px hsla(168, 76%, 50%, 0.5);
+  border: 2px solid hsl(185 30% 7%);
+  box-shadow: 0 0 10px hsla(168, 76%, 50%, 0.55);
   transition: box-shadow 0.2s ease;
 }
 
 .calculator-slider::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 16px hsla(168, 76%, 50%, 0.7);
+  box-shadow: 0 0 14px hsla(168, 76%, 50%, 0.72);
 }
 
 .calculator-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background: hsl(168 76% 50%);
   border-radius: 50%;
   cursor: pointer;
-  border: 3px solid hsl(185 30% 7%);
-  box-shadow: 0 0 10px hsla(168, 76%, 50%, 0.5);
+  border: 2px solid hsl(185 30% 7%);
+  box-shadow: 0 0 10px hsla(168, 76%, 50%, 0.55);
   transition: box-shadow 0.2s ease;
+}
+
+.calculator-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: transparent;
 }

@@ -32,7 +32,7 @@ const DonutComparisonChart: React.FC<DonutComparisonChartProps> = ({ data }) => 
         fill={index === 0 ? 'hsl(180, 10%, 70%)' : 'hsl(192, 75%, 2%)'}
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize={13}
+        fontSize={11}
         fontWeight={600}
       >
         {pct}%
@@ -42,7 +42,7 @@ const DonutComparisonChart: React.FC<DonutComparisonChartProps> = ({ data }) => 
 
   return (
     <div className="flex flex-col items-center w-full">
-      <div className="w-full h-[280px] relative">
+      <div className="relative h-[210px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -50,7 +50,7 @@ const DonutComparisonChart: React.FC<DonutComparisonChartProps> = ({ data }) => 
               cx="50%"
               cy="50%"
               innerRadius={0}
-              outerRadius={110}
+              outerRadius={82}
               paddingAngle={2}
               dataKey="value"
               stroke="none"

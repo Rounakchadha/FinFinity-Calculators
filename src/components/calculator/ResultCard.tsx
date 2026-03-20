@@ -10,19 +10,19 @@ interface ResultCardProps {
 const ResultCard: React.FC<ResultCardProps> = ({ label, value, highlight }) => {
   if (highlight) {
     return (
-      <div className="p-5 rounded-xl bg-calc-accent/8 border border-calc-accent/20">
-        <p className="text-calc-text-secondary text-sm font-medium mb-1">{label}</p>
-        <p className="text-calc-accent text-2xl font-bold tabular-nums">{value}</p>
+      <div className="w-full min-h-33 rounded-2xl border border-calc-accent/20 bg-calc-accent/8 px-6 py-5">
+        <p className="mb-1 text-xs font-medium text-calc-text-secondary">{label}</p>
+        <p className="calc-number text-calc-accent text-lg font-semibold tabular-nums">{value}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex items-start gap-3 py-3">
-      <div className="w-1 h-10 rounded-full bg-calc-accent/60 mt-0.5 flex-shrink-0" />
+    <div className="w-full min-h-28 rounded-2xl border border-calc-border/70 bg-calc-surface/60 px-5 py-4 flex items-center gap-4">
+      <div className="h-12 w-1.5 shrink-0 rounded-full bg-calc-accent/70" />
       <div>
-        <p className="text-calc-text-muted text-sm font-medium mb-0.5">{label}</p>
-        <p className="text-calc-text-primary text-2xl font-bold tabular-nums">{value}</p>
+        <p className="mb-0.5 text-xs font-medium text-calc-text-muted">{label}</p>
+        <p className="calc-number text-calc-text-primary text-lg font-semibold tabular-nums">{value}</p>
       </div>
     </div>
   );
