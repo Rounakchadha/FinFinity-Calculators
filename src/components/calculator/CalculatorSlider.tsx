@@ -8,6 +8,8 @@ interface CalculatorSliderProps {
   step: number;
   unit: string;
   isCurrency?: boolean;
+  compact?: boolean;
+  dense?: boolean;
   showTenureToggle?: boolean;
   onChange: (val: number) => void;
 }
@@ -44,13 +46,14 @@ const formatUnit = (unit: string) => {
   return '';
 };
 
-const getInputWidthCh = (displayValue: string, isCurrency?: boolean) => {
+const getInputWidthEm = (displayValue: string, isCurrency?: boolean) => {
   const compactLength = displayValue.trim().length;
   const safeLength = compactLength <= 0 ? 1 : compactLength;
-  const minWidth = isCurrency ? 3 : 2;
-  const maxWidth = isCurrency ? 12 : 8;
+  const minWidth = isCurrency ? 1.7 : 1.5;
+  const maxWidth = isCurrency ? 7.8 : 5.4;
+  const factor = isCurrency ? 0.6 : 0.56;
 
-  return Math.min(maxWidth, Math.max(minWidth, safeLength));
+  return Math.min(maxWidth, Math.max(minWidth, safeLength * factor));
 };
 
 const generateTicks = (min: number, max: number): number[] => {
@@ -82,6 +85,14 @@ const generateTicks = (min: number, max: number): number[] => {
   return ticks;
 };
 
+const generateAdaptiveTicks = (min: number, max: number, baseMax: number): number[] => {
+  if (max > baseMax) {
+    return [min, baseMax, max];
+  }
+
+  return generateTicks(min, max);
+};
+
 const formatTick = (val: number, isCurrency?: boolean) => {
   if (isCurrency) {
     if (val >= 10000000) return `${(val / 10000000).toFixed(val % 10000000 === 0 ? 0 : 1)}Cr`;
@@ -93,7 +104,7 @@ const formatTick = (val: number, isCurrency?: boolean) => {
 };
 
 const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
-  label, value, min, max, step, unit, isCurrency, showTenureToggle, onChange
+  label, value, min, max, step, unit, isCurrency, compact = false, dense = false, showTenureToggle, onChange
 }) => {
   const decimals = decimalsFromStep(step);
   const [tenureMode, setTenureMode] = useState<'Yearly' | 'Monthly'>('Yearly');
@@ -103,10 +114,12 @@ const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
     setInputValue(formatInputValue(value, isCurrency, decimals));
   }, [value, isCurrency, decimals]);
 
-  const pct = ((value - min) / (max - min)) * 100;
-  const ticks = useMemo(() => generateTicks(min, max), [min, max]);
+  const effectiveMax = Math.max(max, value);
+  const safeRange = Math.max(1, effectiveMax - min);
+  const pct = ((value - min) / safeRange) * 100;
+  const ticks = useMemo(() => generateAdaptiveTicks(min, effectiveMax, max), [min, effectiveMax, max]);
   const unitSuffix = formatUnit(unit);
-  const inputWidthCh = getInputWidthCh(inputValue, isCurrency);
+  const inputWidthEm = getInputWidthEm(inputValue, isCurrency);
 
   const commitInputValue = (rawValue: string) => {
     const parsed = parseInputValue(rawValue, isCurrency);
@@ -116,7 +129,7 @@ const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
       return;
     }
 
-    const clamped = Math.min(max, Math.max(min, parsed));
+    const clamped = Math.max(parsed, min);
     onChange(clamped);
     setInputValue(formatInputValue(clamped, isCurrency, decimals));
   };
@@ -129,7 +142,7 @@ const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
       return;
     }
 
-    if (parsed < min || parsed > max) {
+    if (parsed < min) {
       return;
     }
 
@@ -137,10 +150,10 @@ const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
   };
 
   return (
-    <div className="mb-7">
-      <div className="mb-3 flex items-end justify-between gap-3">
+    <div className={dense ? 'mb-4' : compact ? 'mb-5' : 'mb-7'}>
+      <div className={dense ? 'mb-1.5 flex items-end justify-between gap-3' : compact ? 'mb-2 flex items-end justify-between gap-3' : 'mb-3 flex items-end justify-between gap-3'}>
         <div className="flex items-center gap-3">
-          <label className="text-calc-text-secondary/90 text-[15px] font-medium tracking-wide">{label}</label>
+          <label className={`text-calc-text-secondary/90 font-medium tracking-wide ${dense ? 'text-[14px]' : 'text-[15px]'}`}>{label}</label>
           {showTenureToggle ? (
             <div className="inline-flex rounded-full border border-calc-accent/80 bg-transparent p-0.5">
               <button
@@ -168,7 +181,7 @@ const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
             </div>
           ) : null}
         </div>
-        <div className="flex items-baseline gap-1.5 max-w-[180px]">
+        <div className={`flex items-baseline gap-1.5 ${dense ? 'max-w-40' : 'max-w-45'}`}>
           {isCurrency && <span className="calc-number text-calc-accent text-sm font-medium">₹</span>}
           <input
             type="text"
@@ -181,21 +194,21 @@ const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
                 commitInputValue((e.target as HTMLInputElement).value);
               }
             }}
-            className="calc-number border-b border-calc-accent/70 bg-transparent pb-0.5 text-right text-[22px] leading-none font-medium tabular-nums text-calc-accent outline-none transition-[width,border-color] duration-200 focus:border-calc-accent"
+            className={`calc-number border-b border-calc-accent/70 bg-transparent pb-0.5 text-right leading-none font-medium tabular-nums text-calc-accent outline-none transition-[width,border-color] duration-200 focus:border-calc-accent ${dense ? 'text-[19px]' : compact ? 'text-[20px]' : 'text-[22px]'}`}
             style={{
-              width: `${inputWidthCh}ch`,
-              maxWidth: '150px'
+              width: `${inputWidthEm}em`,
+              maxWidth: dense ? '132px' : '150px'
             }}
             aria-label={`${label} value`}
           />
-          {unitSuffix && <span className="calc-number ml-1 text-calc-accent text-[16px] font-medium">{unitSuffix}</span>}
+          {unitSuffix && <span className={`calc-number ml-1 text-calc-accent font-medium ${dense ? 'text-[15px]' : 'text-[16px]'}`}>{unitSuffix}</span>}
         </div>
       </div>
       <div className="relative">
         <input
           type="range"
           min={min}
-          max={max}
+          max={effectiveMax}
           step={step}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
@@ -205,7 +218,7 @@ const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
           }}
         />
       </div>
-      <div className="mt-2 flex justify-between text-[11px] text-calc-text-muted/90 font-normal">
+      <div className={`flex justify-between text-calc-text-muted/90 font-normal ${dense ? 'mt-1 text-[10px]' : compact ? 'mt-1.5 text-[10px]' : 'mt-2 text-[11px]'}`}>
         {ticks.map((t, i) => (
           <span key={i}>{formatTick(t, isCurrency)}</span>
         ))}

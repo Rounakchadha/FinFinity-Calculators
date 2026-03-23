@@ -32,7 +32,7 @@ export const CALCULATOR_DATA: Record<TabType, CalculatorConfig> = {
   EMI: {
     title: "Calculate Loan EMI",
     sliders: [
-      { label: "Loan Amount", min: 100000, max: 10000000, step: 50000, defaultValue: 3500000, unit: "₹", isCurrency: true },
+      { label: "Loan Amount", min: 100000, max: 50000000, step: 100000, defaultValue: 3500000, unit: "₹", isCurrency: true },
       { label: "Interest Rate", min: 5, max: 20, step: 0.25, defaultValue: 9.25, unit: "%" },
       { label: "Loan Tenure", min: 1, max: 30, step: 1, defaultValue: 20, unit: "yrs" },
     ],
@@ -49,7 +49,7 @@ export const CALCULATOR_DATA: Record<TabType, CalculatorConfig> = {
   SIP: {
     title: "Calculate Step-Up SIP",
     sliders: [
-      { label: "Monthly Investment", min: 500, max: 100000, step: 500, defaultValue: 5000, unit: "₹", isCurrency: true },
+      { label: "Monthly Investment", min: 500, max: 500000, step: 500, defaultValue: 5000, unit: "₹", isCurrency: true },
       { label: "Annual Step-Up", min: 1, max: 25, step: 1, defaultValue: 10, unit: "%" },
       { label: "Expected Annual Return", min: 1, max: 30, step: 0.5, defaultValue: 12, unit: "%" },
       { label: "Time Period", min: 1, max: 40, step: 1, defaultValue: 20, unit: "yrs" },
@@ -67,11 +67,11 @@ export const CALCULATOR_DATA: Record<TabType, CalculatorConfig> = {
   "Loan Saver": {
     title: "Loan Saver Calculator",
     sliders: [
-      { label: "Loan Amount", min: 1000000, max: 50000000, step: 100000, defaultValue: 25000000, unit: "₹", isCurrency: true },
+      { label: "Loan Amount", min: 1000000, max: 200000000, step: 250000, defaultValue: 25000000, unit: "₹", isCurrency: true },
       { label: "Current Interest Rate", min: 5, max: 15, step: 0.1, defaultValue: 8.0, unit: "%" },
       { label: "Loan Tenure", min: 1, max: 30, step: 0.5, defaultValue: 20, unit: "yrs" },
       { label: "Transfer Interest Rate", min: 5, max: 15, step: 0.1, defaultValue: 7.0, unit: "%" },
-      { label: "Processing Fee", min: 0, max: 200000, step: 5000, defaultValue: 50000, unit: "₹", isCurrency: true },
+      { label: "Processing Fee", min: 0, max: 1000000, step: 10000, defaultValue: 50000, unit: "₹", isCurrency: true },
     ],
     results: [
       { label: "Current EMI", value: "₹2,09,110" },
@@ -86,8 +86,8 @@ export const CALCULATOR_DATA: Record<TabType, CalculatorConfig> = {
   "My 1st Crore": {
     title: "My 1st Crore Calculator",
     sliders: [
-      { label: "Monthly Investment", min: 1000, max: 200000, step: 1000, defaultValue: 10000, unit: "₹", isCurrency: true },
-      { label: "Target Amount", min: 10000000, max: 100000000, step: 1000000, defaultValue: 10000000, unit: "₹", isCurrency: true },
+      { label: "Monthly Investment", min: 1000, max: 1000000, step: 1000, defaultValue: 10000, unit: "₹", isCurrency: true },
+      { label: "Target Amount", min: 10000000, max: 1000000000, step: 5000000, defaultValue: 10000000, unit: "₹", isCurrency: true },
       { label: "Expected Annual Return", min: 1, max: 30, step: 0.5, defaultValue: 12, unit: "%" },
     ],
     results: [

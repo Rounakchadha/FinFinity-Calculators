@@ -26,7 +26,7 @@ const FeaturedCalculatorsSection: React.FC = () => {
         <CalculatorTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Main Container */}
-        <div className="overflow-hidden rounded-3xl border border-calc-border bg-calc-surface/70 p-4 backdrop-blur-md sm:p-5 lg:p-6">
+        <div className="overflow-hidden rounded-3xl border border-calc-border bg-calc-surface/70 p-4 pb-7 backdrop-blur-md sm:p-5 sm:pb-8 lg:p-6 lg:pb-10">
           <CalculatorPanel key={activeTab} tab={activeTab} config={CALCULATOR_DATA[activeTab]} />
         </div>
       </div>
