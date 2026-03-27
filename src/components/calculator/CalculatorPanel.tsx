@@ -475,16 +475,21 @@ const CalculatorPanel: React.FC<CalculatorPanelProps> = ({ tab, config }) => {
   };
 
   const hasInvalidValue = sliderValues.some((value) => validateRequiredNumber(value) !== null);
+  const { results, chartData, scheduleTitle, scheduleColumns, scheduleRows, xmlInputs, xmlOutputs } = useMemo(() => {
+    const computed = {
+      results: config.results,
+      chartData: config.chart,
+      scheduleTitle: 'Schedule',
+      scheduleColumns: [] as ScheduleColumn[],
+      scheduleRows: [] as Array<Record<string, string | number>>,
+      xmlInputs: {} as Record<string, string | number>,
+      xmlOutputs: {} as Record<string, string | number>,
+    };
 
-  let results: ResultConfig[] = config.results;
-  let chartData: ChartSegment[] = config.chart;
-  let scheduleTitle = 'Schedule';
-  let scheduleColumns: ScheduleColumn[] = [];
-  let scheduleRows: Array<Record<string, string | number>> = [];
-  let xmlInputs: Record<string, string | number> = {};
-  let xmlOutputs: Record<string, string | number> = {};
+    if (hasInvalidValue) {
+      return computed;
+    }
 
-  if (!hasInvalidValue) {
     if (tab === 'EMI') {
       const [loanAmount, annualInterestRate, tenureYears] = sliderValues;
       const outputs = calculateEmi({
@@ -493,19 +498,19 @@ const CalculatorPanel: React.FC<CalculatorPanelProps> = ({ tab, config }) => {
         tenureMonths: Math.round(tenureYears * 12),
       });
 
-      results = [
+      computed.results = [
         { label: 'Loan EMI', value: formatCurrencyINR(outputs.emi) },
         { label: 'Total Interest', value: formatCurrencyINR(outputs.totalInterest) },
         { label: 'Total Payment', value: formatCurrencyINR(outputs.totalPayment), highlight: true },
       ];
 
-      chartData = [
+      computed.chartData = [
         { name: 'Principal', value: loanAmount },
         { name: 'Total Interest', value: outputs.totalInterest },
       ];
 
-      scheduleTitle = 'EMI Repayment Schedule';
-      scheduleColumns = [
+      computed.scheduleTitle = 'EMI Repayment Schedule';
+      computed.scheduleColumns = [
         { key: 'month', label: 'Month', kind: 'number' },
         { key: 'openingBalance', label: 'Opening', align: 'right', kind: 'currency' },
         { key: 'emi', label: 'EMI', align: 'right', kind: 'currency' },
@@ -513,22 +518,24 @@ const CalculatorPanel: React.FC<CalculatorPanelProps> = ({ tab, config }) => {
         { key: 'interest', label: 'Interest', align: 'right', kind: 'currency' },
         { key: 'closingBalance', label: 'Closing', align: 'right', kind: 'currency' },
       ];
-      scheduleRows = outputs.schedule;
+      computed.scheduleRows = outputs.schedule;
 
-      xmlInputs = {
+      computed.xmlInputs = {
         loanAmount: normalizeXmlNumber(loanAmount),
         annualInterestRatePercent: normalizeXmlNumber(annualInterestRate),
         tenureYears: normalizeXmlNumber(tenureYears),
       };
-      xmlOutputs = {
+      computed.xmlOutputs = {
         emi: normalizeXmlNumber(outputs.emi),
         totalInterest: normalizeXmlNumber(outputs.totalInterest),
         totalPayment: normalizeXmlNumber(outputs.totalPayment),
       };
+
+      return computed;
     }
 
     if (tab === 'SIP') {
-      const [monthlyInvestment, annualStepUp, annualReturn, years] = sliderValues;
+      const [monthlyInvestment, , annualReturn, years] = sliderValues;
       const outputs =
         sipContributionMode === 'lumpsum'
           ? calculateLumpsum({
@@ -543,47 +550,46 @@ const CalculatorPanel: React.FC<CalculatorPanelProps> = ({ tab, config }) => {
               years,
             });
 
-      results = [
+      computed.results = [
         { label: 'Future Value', value: formatCurrencyINR(outputs.futureValue) },
         { label: 'Invested Amount', value: formatCurrencyINR(outputs.investedAmount) },
         { label: 'Wealth Gained', value: formatCurrencyINR(outputs.wealthGained), highlight: true },
       ];
 
-      chartData = [
+      computed.chartData = [
         { name: 'Invested Amount', value: outputs.investedAmount },
         { name: 'Wealth Gained', value: Math.max(outputs.wealthGained, 0) },
       ];
 
-      scheduleTitle =
+      computed.scheduleTitle =
         sipContributionMode === 'lumpsum'
           ? 'Lumpsum Growth Schedule'
           : sipAnnualStepUp > 0
             ? 'Step-Up SIP Schedule'
             : 'SIP Schedule';
-      scheduleColumns = [
+      computed.scheduleColumns = [
         { key: 'month', label: 'Month', kind: 'number' },
         { key: 'openingBalance', label: 'Opening', align: 'right', kind: 'currency' },
         { key: 'investment', label: 'Investment', align: 'right', kind: 'currency' },
         { key: 'interest', label: 'Interest', align: 'right', kind: 'currency' },
         { key: 'closingBalance', label: 'Closing', align: 'right', kind: 'currency' },
       ];
-      scheduleRows = outputs.schedule;
+      computed.scheduleRows = outputs.schedule;
 
-      xmlInputs = {
+      computed.xmlInputs = {
         contributionMode: sipContributionMode,
         monthlyInvestment: normalizeXmlNumber(monthlyInvestment),
-        annualStepUpPercent:
-          sipContributionMode === 'lumpsum'
-            ? 0
-            : normalizeXmlNumber(sipAnnualStepUp),
+        annualStepUpPercent: sipContributionMode === 'lumpsum' ? 0 : normalizeXmlNumber(sipAnnualStepUp),
         expectedAnnualReturnPercent: normalizeXmlNumber(annualReturn),
         years: normalizeXmlNumber(years),
       };
-      xmlOutputs = {
+      computed.xmlOutputs = {
         investedAmount: normalizeXmlNumber(outputs.investedAmount),
         futureValue: normalizeXmlNumber(outputs.futureValue),
         wealthGained: normalizeXmlNumber(outputs.wealthGained),
       };
+
+      return computed;
     }
 
     if (tab === 'Loan Saver') {
@@ -597,24 +603,24 @@ const CalculatorPanel: React.FC<CalculatorPanelProps> = ({ tab, config }) => {
         processingFee,
       });
 
-      results = [
+      computed.results = [
         { label: 'Current EMI', value: formatCurrencyINR(outputs.currentEmi) },
         { label: 'New EMI', value: formatCurrencyINR(outputs.newEmi) },
         { label: 'Monthly Savings', value: formatCurrencyINR(outputs.monthlySavings), highlight: true },
       ];
 
-      chartData = [
+      computed.chartData = [
         { name: 'Current Payment', value: outputs.currentTotalPayment },
         { name: 'New Payment', value: outputs.newTotalPayment },
       ];
 
-      scheduleTitle = 'Loan Transfer Comparison';
-      scheduleColumns = [
+      computed.scheduleTitle = 'Loan Transfer Comparison';
+      computed.scheduleColumns = [
         { key: 'option', label: 'Option', kind: 'text' },
         { key: 'emi', label: 'EMI', align: 'right', kind: 'currency' },
         { key: 'totalPayment', label: 'Total Payment', align: 'right', kind: 'currency' },
       ];
-      scheduleRows = [
+      computed.scheduleRows = [
         {
           option: 'Current Loan',
           emi: outputs.currentEmi,
@@ -627,81 +633,83 @@ const CalculatorPanel: React.FC<CalculatorPanelProps> = ({ tab, config }) => {
         },
       ];
 
-      xmlInputs = {
+      computed.xmlInputs = {
         loanAmount: normalizeXmlNumber(loanAmount),
         currentInterestRatePercent: normalizeXmlNumber(currentInterestRate),
         transferInterestRatePercent: normalizeXmlNumber(transferInterestRate),
         tenureYears: normalizeXmlNumber(tenureYears),
         processingFee: normalizeXmlNumber(processingFee),
       };
-      xmlOutputs = {
+      computed.xmlOutputs = {
         currentEmi: normalizeXmlNumber(outputs.currentEmi),
         newEmi: normalizeXmlNumber(outputs.newEmi),
         monthlySavings: normalizeXmlNumber(outputs.monthlySavings),
         totalSavings: normalizeXmlNumber(outputs.totalSavings),
       };
+
+      return computed;
     }
 
-    if (tab === 'My 1st Crore') {
-      const [monthlyInvestment, targetAmount, annualReturn] = sliderValues;
-      const outputs = calculateFirstCrore({
-        monthlyInvestment,
-        targetAmount,
-        annualReturnPercent: annualReturn,
-      });
+    const [monthlyInvestment, targetAmount, annualReturn] = sliderValues;
+    const outputs = calculateFirstCrore({
+      monthlyInvestment,
+      targetAmount,
+      annualReturnPercent: annualReturn,
+    });
 
-      results = [
-        { label: 'Time Period', value: `${outputs.yearsToTarget.toFixed(1)} yrs` },
-        { label: 'Invested Amount', value: formatCurrencyINR(outputs.totalInvested) },
-        { label: 'Wealth Gained', value: formatCurrencyINR(outputs.wealthGained), highlight: true },
-      ];
+    computed.results = [
+      { label: 'Time Period', value: `${outputs.yearsToTarget.toFixed(1)} yrs` },
+      { label: 'Invested Amount', value: formatCurrencyINR(outputs.totalInvested) },
+      { label: 'Wealth Gained', value: formatCurrencyINR(outputs.wealthGained), highlight: true },
+    ];
 
-      chartData = [
-        { name: 'Invested Amount', value: outputs.totalInvested },
-        { name: 'Wealth Gained', value: Math.max(outputs.wealthGained, 0) },
-      ];
+    computed.chartData = [
+      { name: 'Invested Amount', value: outputs.totalInvested },
+      { name: 'Wealth Gained', value: Math.max(outputs.wealthGained, 0) },
+    ];
 
-      const totalMonths = Math.max(1, Math.ceil(outputs.monthsToTarget));
-      const monthlyRate = outputs.nominalAnnualRate / 12;
-      let balance = 0;
-      let invested = 0;
-      const projectionRows: Array<Record<string, string | number>> = [];
+    const totalMonths = Math.max(1, Math.ceil(outputs.monthsToTarget));
+    const monthlyRate = outputs.nominalAnnualRate / 12;
+    let balance = 0;
+    let invested = 0;
+    const projectionRows: Array<Record<string, string | number>> = [];
 
-      for (let month = 1; month <= totalMonths; month += 1) {
-        balance = (balance + monthlyInvestment) * (1 + monthlyRate);
-        invested += monthlyInvestment;
+    for (let month = 1; month <= totalMonths; month += 1) {
+      balance = (balance + monthlyInvestment) * (1 + monthlyRate);
+      invested += monthlyInvestment;
 
-        if (month % 12 === 0 || month === totalMonths) {
-          projectionRows.push({
-            year: Math.ceil(month / 12),
-            investedAmount: invested,
-            estimatedValue: balance,
-            wealthGained: balance - invested,
-          });
-        }
+      if (month % 12 === 0 || month === totalMonths) {
+        projectionRows.push({
+          year: Math.ceil(month / 12),
+          investedAmount: invested,
+          estimatedValue: balance,
+          wealthGained: balance - invested,
+        });
       }
-
-      scheduleTitle = 'Year-wise Projection';
-      scheduleColumns = [
-        { key: 'year', label: 'Year', kind: 'number' },
-        { key: 'investedAmount', label: 'Invested', align: 'right', kind: 'currency' },
-        { key: 'estimatedValue', label: 'Estimated Value', align: 'right', kind: 'currency' },
-        { key: 'wealthGained', label: 'Wealth Gained', align: 'right', kind: 'currency' },
-      ];
-      scheduleRows = projectionRows;
-
-      xmlInputs = {
-        monthlyInvestment: normalizeXmlNumber(monthlyInvestment),
-        targetAmount: normalizeXmlNumber(targetAmount),
-        annualReturnPercent: normalizeXmlNumber(annualReturn),
-      };
-      xmlOutputs = {
-        yearsToTarget: normalizeXmlNumber(outputs.yearsToTarget),
-        totalInvested: normalizeXmlNumber(outputs.totalInvested),
-        wealthGained: normalizeXmlNumber(outputs.wealthGained),
-      };
     }
-  }
+
+    computed.scheduleTitle = 'Year-wise Projection';
+    computed.scheduleColumns = [
+      { key: 'year', label: 'Year', kind: 'number' },
+      { key: 'investedAmount', label: 'Invested', align: 'right', kind: 'currency' },
+      { key: 'estimatedValue', label: 'Estimated Value', align: 'right', kind: 'currency' },
+      { key: 'wealthGained', label: 'Wealth Gained', align: 'right', kind: 'currency' },
+    ];
+    computed.scheduleRows = projectionRows;
+
+    computed.xmlInputs = {
+      monthlyInvestment: normalizeXmlNumber(monthlyInvestment),
+      targetAmount: normalizeXmlNumber(targetAmount),
+      annualReturnPercent: normalizeXmlNumber(annualReturn),
+    };
+    computed.xmlOutputs = {
+      yearsToTarget: normalizeXmlNumber(outputs.yearsToTarget),
+      totalInvested: normalizeXmlNumber(outputs.totalInvested),
+      wealthGained: normalizeXmlNumber(outputs.wealthGained),
+    };
+
+    return computed;
+  }, [config.chart, config.results, hasInvalidValue, sipAnnualStepUp, sipContributionMode, sliderValues, tab]);
 
   const handleDownloadXml = () => {
     const xml = buildCalculatorXml({

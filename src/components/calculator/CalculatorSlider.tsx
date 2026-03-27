@@ -129,7 +129,7 @@ const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
       return;
     }
 
-    const clamped = Math.max(parsed, min);
+    const clamped = Math.min(max, Math.max(parsed, min));
     onChange(clamped);
     setInputValue(formatInputValue(clamped, isCurrency, decimals));
   };
@@ -142,7 +142,7 @@ const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
       return;
     }
 
-    if (parsed < min) {
+    if (parsed < min || parsed > max) {
       return;
     }
 
@@ -211,7 +211,14 @@ const CalculatorSlider: React.FC<CalculatorSliderProps> = ({
           max={effectiveMax}
           step={step}
           value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
+          onChange={(e) => {
+            const parsed = Number(e.target.value);
+            if (!Number.isFinite(parsed)) {
+              return;
+            }
+
+            onChange(Math.min(max, Math.max(min, parsed)));
+          }}
           className="w-full calculator-slider"
           style={{
             background: `linear-gradient(to right, rgba(45, 212, 191, 0.95) 0%, rgba(45, 212, 191, 0.95) ${pct}%, rgba(228, 236, 238, 0.95) ${pct}%, rgba(228, 236, 238, 0.95) 100%)`
